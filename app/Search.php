@@ -11,14 +11,9 @@ namespace App;
 /**
  * Files are:
  * txt
-[
-    search_query => value,
-]
+ *    search_query => value
+ *   ...
  *
- * json
- * {[
-        "key" : "value",
- * ]}
  */
 
 class Search
@@ -42,24 +37,21 @@ class Search
                         $matches[] = substr($buffer, $pos + strlen($_GET['query'] . "=> "));
                 }
                 fclose($ha);
+            } else {
+                // return Error code
+                return 2;
             }
 
 
-        } else if($extension == 'json') {
-            $ha = fopen($f, 'r');
-            if($ha){
-                while(!feao($ha)) {
-                    $buffer = fgets($ha);
-                    if($pos = strpos($buffer, $_GET['query'] . "\" : \"") !== FALSE)
-                        $matches[] = substr($buffer, $pos + strlen($_GET['query'] . "\" : \""));
-                }
-
-            }
+        } else {
+            // error
+            return 1;
         }
 
+        // process matches into html
         if(isset($matches)) {
             foreach ($matches as $match) {
-                $return .= '1: ' . $match;
+                $return .= '<p>' . trim($match) . '</p>';
             }
         }
 
