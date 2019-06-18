@@ -6,30 +6,58 @@
  * Time: 08:56
  */
 
+/**
+ * Files are:
+ * txt
+[
+    search_query => value,
+]
+ *
+ * json
+ * {[
+        "key" : "value",
+ * ]}
+ */
+
 class Search
 {
     // get search results
     public function get($f)
     {
         // wyświetl zapytanie
-      echo("<p>Search results for query: " .
-              $_GET['query'] . ".</p>");        // od razu HTML
+      $return = "<p>Search results for query: " .
+              $_GET['query'] . ".</p>";        // od razu HTML
 
         // Get the extension off the image filename
         $pieces = explode('.', $f);
         $extension = array_pop($pieces);
         if ($extension == 'txt') {
-            if ($_GET['query'] == '') {
-                // do something
-            } else {
-                //search in the file
+            $ha = @fopen($f, 'r');
+            if($ha){
+                while(!feao($ha)) {
+                    $buffer = fgets($ha);
+                    if($pos = strpos($buffer, $_GET['query'] . " => ") !== FALSE)
+                        $matches[] = substr($buffer, $pos + strlen($_GET['query'] . "=> "));
+                }
+
             }
+            fclose($ha);
+
         } else if($extension == 'json') {
+            $ha = fopen($f, 'r');
+            if($ha){
+                while(!feao($ha)) {
+                    $buffer = fgets($ha);
+                    if($pos = strpos($buffer, $_GET['query'] . "\" : \"") !== FALSE)
+                        $matches[] = substr($buffer, $pos + strlen($_GET['query'] . "\" : \""));
+                }
 
+            }
         }
+
+        foreach ($matches as $match) {
+            $return .= '1: ' . $match;
+        }
+        return $return;
     }
-}
-
-class DataHelper {
-
 }
