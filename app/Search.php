@@ -6,6 +6,8 @@
  * Time: 08:56
  */
 
+namespace App;
+
 /**
  * Files are:
  * txt
@@ -34,14 +36,14 @@ class Search
         if ($extension == 'txt') {
             $ha = @fopen($f, 'r');
             if($ha){
-                while(!feao($ha)) {
+                while(!feof($ha)) {
                     $buffer = fgets($ha);
                     if($pos = strpos($buffer, $_GET['query'] . " => ") !== FALSE)
                         $matches[] = substr($buffer, $pos + strlen($_GET['query'] . "=> "));
                 }
-
+                fclose($ha);
             }
-            fclose($ha);
+
 
         } else if($extension == 'json') {
             $ha = fopen($f, 'r');
@@ -55,9 +57,12 @@ class Search
             }
         }
 
-        foreach ($matches as $match) {
-            $return .= '1: ' . $match;
+        if(isset($matches)) {
+            foreach ($matches as $match) {
+                $return .= '1: ' . $match;
+            }
         }
+
         return $return;
     }
 }
