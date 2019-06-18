@@ -1,60 +1,92 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: janzaba
- * Date: 2019-06-18
- * Time: 08:56
- */
 
 namespace App;
 
-/**
- * Files are:
- * txt
- *    search_query => value
- *   ...
- *
- */
-
 class Search
 {
-    // get search results
-    public function get($f)
+    /**
+     * @param $fileName
+     * @return int|string
+     * @deprecated
+     */
+    public function get($fileName)
     {
-        // wyświetl zapytanie
-      $return = "<p>Search results for query: " .
-              $_GET['query'] . ".</p>";        // od razu HTML
+        $query = $_GET['query'];
+        $return = sprintf('<p>Search results for query: %s.</p>', $query);
 
-        // Get the extension off the image filename
-        $pieces = explode('.', $f);
-        $extension = array_pop($pieces);
-        if ($extension == 'txt') {
-            $ha = @fopen($f, 'r');
-            if($ha){
-                while(!feof($ha)) {
-                    $buffer = fgets($ha);
-                    if($pos = strpos($buffer, $_GET['query'] . " => ") !== FALSE)
-                        $matches[] = substr($buffer, $pos + strlen($_GET['query'] . "=> "));
-                }
-                fclose($ha);
-            } else {
-                // return Error code
-                return 2;
-            }
-
-
-        } else {
-            // error
+        if ($this->getFileExtension($fileName) != 'txt') {
             return 1;
         }
 
-        // process matches into html
-        if(isset($matches)) {
-            foreach ($matches as $match) {
-                $return .= '<p>' . trim($match) . '</p>';
-            }
+        try {
+            $matches = $this->getSearchResults($fileName, $query);
+        } catch (\Exception $e) {
+            return 2;
         }
 
-        return $return;
+        $matches = array_map([$this, 'wrapLine'], $matches);
+
+        return $return . implode('', $matches);
+    }
+
+    /**
+     * @param string $filePath
+     * @param string $query
+     * @return array
+     * @throws \Exception
+     */
+    public function getSearchResults(string $filePath, string $query)
+    {
+        $matches = [];
+        foreach ($this->getLines($filePath) as $line) {
+            preg_match(
+                sprintf('/^%s => (.*)$/', $query),
+                $line,
+                $match
+            );
+            if (count($match)) {
+                $matches[] = $match[1];
+            }
+        }
+        return $matches;
+    }
+
+    /**
+     * @param $fileName
+     * @return string
+     */
+    private function getFileExtension($fileName): string
+    {
+        $pieces = explode('.', $fileName);
+        $extension = array_pop($pieces);
+        return $extension;
+    }
+
+    /**
+     * @param string $filePath
+     * @return \Generator
+     * @throws \Exception
+     */
+    private function getLines(string $filePath)
+    {
+        $file = @fopen($filePath, 'r');
+        if (!$file) {
+            throw new \Exception('File does not exist or cannot be opened.');
+        }
+
+        while (($line = fgets($file)) != false) {
+            yield $line;
+        }
+
+        fclose($file);
+    }
+
+    /**
+     * @param $line
+     * @return string
+     */
+    private function wrapLine($line)
+    {
+        return '<p>' . $line . '</p>';
     }
 }
