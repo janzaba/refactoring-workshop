@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MessDetector">
+    <phpmd_settings>
+      <MessDetectorConfiguration tool_path="$USER_HOME$/www/mediafy2/project/vendor/phpmd/phpmd/src/bin/phpmd" timeout="30000" />
+    </phpmd_settings>
+  </component>
+  <component name="PhpCodeSniffer">
+    <phpcs_settings>
+      <PhpCSConfiguration standards="MySource;PEAR;PSR1;PSR2;Squiz;Zend" tool_path="/usr/local/php5-7.0.8-20160626-123411/bin/phpcs" timeout="30000" />
+    </phpcs_settings>
+  </component>
+</project>

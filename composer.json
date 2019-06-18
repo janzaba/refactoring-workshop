@@ -1,0 +1,11 @@
+{
+    "name": "tim/high-quality-code",
+    "description": "For presentation",
+    "authors": [
+        {
+            "name": "Jan Zaba",
+            "email": "j.zaba@tim.pl"
+        }
+    ],
+    "require": {}
+}
